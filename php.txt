@@ -1,0 +1,45 @@
+<?php
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    // Get form data
+    $name = htmlspecialchars($_POST['name']);
+    $rollnumber = htmlspecialchars($_POST['rollnumber']);
+    $email = htmlspecialchars($_POST['email']);
+    $contact = htmlspecialchars($_POST['contact']);
+    
+    // Handle file upload
+    if (isset($_FILES['file']) && $_FILES['file']['error'] === UPLOAD_ERR_OK) {
+        $fileTmpPath = $_FILES['file']['tmp_name'];
+        $fileName = $_FILES['file']['name'];
+        $fileSize = $_FILES['file']['size'];
+        $fileType = $_FILES['file']['type'];
+        $fileNameCmps = explode(".", $fileName);
+        $fileExtension = strtolower(end($fileNameCmps));
+
+        $allowedfileExtensions = ['jpg', 'jpeg', 'png'];
+        if (in_array($fileExtension, $allowedfileExtensions)) {
+            $uploadFileDir = './uploads/';
+            if (!is_dir($uploadFileDir)) {
+                mkdir($uploadFileDir, 0777, true);
+            }
+            $dest_path = $uploadFileDir . $fileName;
+
+            if (move_uploaded_file($fileTmpPath, $dest_path)) {
+                echo "Registration Successful!<br>";
+                echo "Name: $name<br>";
+                echo "Student ID: $rollnumber<br>";
+                echo "Email: $email<br>";
+                echo "Contact: $contact<br>";
+                echo "File uploaded successfully to: $dest_path<br>";
+            } else {
+                echo "Error moving the uploaded file.";
+            }
+        } else {
+            echo "Upload failed. Only JPG, JPEG, and PNG files are allowed.";
+        }
+    } else {
+        echo "Error in file upload.";
+    }
+} else {
+    echo "Invalid request method.";
+}
+?>
